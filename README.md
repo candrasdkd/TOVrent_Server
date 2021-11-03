@@ -1,43 +1,96 @@
-# **TOVrent project**
+# **TOVrent - BACKEND**
+<p align="center">
+  <img src="public/images/icon/tov.png" />
+</p>
 
-TOVrent is a vehicle rental website and application, this first my project in arkademy batch 23
+<br>
 
-### **Create Files Based on Modularisasi**
-BACKEND DEVELOPER VERSION 
+TOVrent is an example of various vehicle rental websites aimed at helping people make it easier if they want to rent a vehicle while on vacation or rent a vehicle for their hobbies
 
-A. First step prepare tool 
+<br>
 
-1. Visual Code (https://code.visualstudio.com/)
-2. NodeJs (https://nodejs.org/en/download/)
-3. MySQL/Oracle/Prosgate/other
-4. Postman (https://www.postman.com/downloads/)
-5. XAMPP (option) (https://www.apachefriends.org/index.html)
+### **BUILT WITH**
 
-----
+---
 
-B. First Create files & method request
-1. Create folder TOVrent
-2. Open visual code, then create file index.js in folder TOVrent, and open terminal write **npm init** to install file package.json, after that install **npm i express** create node_modules and package-lock.json, then install {**npm i morgan, npm i mysql, npm i dotenv**} morgan for monitor status in terminal, mysql for connect to mysql database, dotenv for secret your database/other
-3. Create folders routes, models, handlers, database, middlewares, helper because I want to use files by function
-4. Create files based on folder functions and individual needed
-5. Don't forget to use the method request **GET, POST, PATCH, DELETE** in the desired **files**
+- [Node.js (JavaScript Runtime)](https://nodejs.org/en/)
+- [Express.js (Back-end Web Application Framework)](https://expressjs.com/)
+- [MySQL (Database)](https://www.mysql.com/)
+- [Multer (Upload Middleware)](https://www.npmjs.com/package/multer)
+- [Socket.io (Realtime)](https://socket.io/docs/v4/server-installation/)
+- [Nodemailer (OTP)](https://nodemailer.com/about/)
 
-----
+### **TOOLS**
 
-C. Second Otentikasi dan Otorisasi, CORS, Multer
-1. Install package **npm i jsonwebtoken bcrypt multer cors**, function jsonwebtoken for create access token, bcrypt for create normal password become random password (hash), multer for can use function upload something, cors for another server can access from original server
-2. Create file **user** and **auth**, in each file **user** and **auth** is used to make login, register, and upload
+---
 
-----
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [XAMPP](https://www.apachefriends.org/index.html)
+- [Postman](https://www.postman.com/)
 
-D. Thrid How to Deploy With AWS
-1. Have account aws and download putty (https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
-2. Create instance EC2, finish the procces *Amazon Machine Image (Ubuntu/any), Instance Type, Configure Instance, Add Storage, Add Storage, Configure Security Group, Review*. If the procces done download **KEY PAIR** and save it   
-3. Open PuTTY Configuration and PuTTY Key Generator, first PuTTY Key Generator choose load search your **KEY PAIR** if don't have private key can create it, then PuTTY Configuration check "connection" > "ssh" > "auth" > browse (enter the private key that has been created), if done enter the private key back to "session" hostname obtained from AWS open instance and choose connect(SSH CLIENT) copy id and create saved session for checpoint if connection problem
-4. After that click button "OPEN" wait until terminal ubuntu comes out
-5. Always check update ubuntu (**check sudo apt update**), if need upgrade (**sudo apt upgrade -y**) 
-6. Check git, nodeJs, and mysql
+### **INSTALLATION**
 
+---
 
+STEP 1 : Add this folder in local computer
 
+```
+git clone https://github.com/candrasdkd/TOVrent_Server.git
+```
 
+STEP 2 : Install module & Package
+
+```
+yarn install
+```
+
+STEP 3 : Install DOTENV
+
+```
+yarn add dotenv
+```
+
+STEP 4 : create ENV
+
+```
+DB_HOST = "HOST"
+DB_USER = "USER"
+DB_PASSWORD = ""
+DB_DATABASE = "DATABASE"
+SECRET_KEY = KEY
+SECRET_PORT = PORT
+
+EMAIL_SENDER = "EMAIL"
+PASSWORD_SENDER = "PASSWORD"
+```
+
+### **HOW TO RUN**
+
+---
+
+You'll need to run
+
+```
+yarn start
+```
+
+The application will run on the designated port. Since we used the 8000 port to run the backend, it should run on [http://localhost:8000/](http://localhost:8000/).
+<br>
+
+### **AVAILABLE ROUTES**
+
+---
+
+link dokumentasi postman
+There are four main routes, with each route stemming from the base route in this application.
+
+- [("/")](http://localhost:8000/) is the base route.
+- [("/auth")](https://documenter.getpostman.com/view/16864421/UV5WEJc9#5abd0c28-d996-44fe-ae81-69a4087da3a1) is the route which handles anything related to authentication (Login, Register, Logout, Forgot Password).
+- [("/users")](https://documenter.getpostman.com/view/16864421/UV5WEJc9#43335b07-61ef-49f1-b64e-585049cb6a2b) handles requests involving user data, such as profile.
+- [("/vehicle")](https://documenter.getpostman.com/view/16864421/UV5WEJc9#7fafa750-5949-4a58-a228-ffa93edbdc54) handle requests involving request data, such as vehicle data, add vehicle, edit vehicle.
+- [("/history")](https://documenter.getpostman.com/view/16864421/UV5WEJc9#7fafa750-5949-4a58-a228-ffa93edbdc54) manages requests related to the all history users.
+  <br>
+
+### **RELATED PROJECT(S)**
+
+- [TOVrent Front-end](https://github.com/candrasdkd/TOVrent_Web)
