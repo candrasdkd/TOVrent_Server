@@ -53,15 +53,15 @@ yarn add dotenv
 STEP 4 : create ENV
 
 ```
-DB_HOST = "HOST"
-DB_USER = "USER"
+DB_HOST = "YOUR HOST"
+DB_USER = "YOUR USER "
 DB_PASSWORD = ""
 DB_DATABASE = "DATABASE"
 SECRET_KEY = KEY
 SECRET_PORT = PORT
 
-EMAIL_SENDER = "EMAIL"
-PASSWORD_SENDER = "PASSWORD"
+EMAIL_SENDER = "YOUR EMAIL SENDER"
+PASSWORD_SENDER = "YOUR PASSWORD SENDER"
 ```
 
 ### **HOW TO RUN**
@@ -84,11 +84,11 @@ The application will run on the designated port. Since we used the 8000 port to 
 [link dokumentasi postman](https://documenter.getpostman.com/view/16864421/UVC2Fo1U)
 There are four main routes, with each route stemming from the base route in this application.
 
-- [("/")](http://localhost:8000/) is the base route.
-- [("/auth")](https://documenter.getpostman.com/view/16864421/UV5WEJc9#5abd0c28-d996-44fe-ae81-69a4087da3a1) is the route which handles anything related to authentication (Login, Register, Logout, Forgot Password).
-- [("/users")](https://documenter.getpostman.com/view/16864421/UV5WEJc9#43335b07-61ef-49f1-b64e-585049cb6a2b) handles requests involving user data, such as profile.
-- [("/vehicle")](https://documenter.getpostman.com/view/16864421/UV5WEJc9#7fafa750-5949-4a58-a228-ffa93edbdc54) handle requests involving request data, such as vehicle data, add vehicle, edit vehicle.
-- [("/history")](https://documenter.getpostman.com/view/16864421/UV5WEJc9#7fafa750-5949-4a58-a228-ffa93edbdc54) manages requests related to the all history users.
+- [("/")] is the base route.
+- [("/auth")] is the route which handles anything related to authentication (Login, Register, Logout, Forgot Password).
+- [("/users")]handles requests involving user data, such as profile.
+- [("/vehicle")] handle requests involving request data, such as vehicle data, add vehicle, edit vehicle.
+- [("/history")] manages requests related to the all history users.
   <br>
 
 ### **RELATED PROJECT(S)**
