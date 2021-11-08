@@ -23,11 +23,17 @@ const getHistoryById = (req, res) => {
     .then((data) => responseHelper.success(res, "Success", 200, data))
     .catch((err) => responseHelper.error(res, "Error", 500, err));
 };
-
-const deleteHistory = (req, res) => {
-  const { body } = req;
+const getHistoryByUser = (req, res) => {
+  const { params } = req;
   historyModel
-    .deleteHistory(body)
+    .getHistoryByUser(params)
+    .then((data) => responseHelper.success(res, "Success", 200, data))
+    .catch((err) => responseHelper.error(res, "Error", 500, err));
+};
+const deleteHistory = (req, res) => {
+  const { params } = req;
+  historyModel
+    .deleteHistory(params.id)
     .then((data) => responseHelper.success(res, "Success", 200, data))
     .catch((err) => responseHelper.error(res, "Error", 500, err));
 };
@@ -35,6 +41,7 @@ const deleteHistory = (req, res) => {
 module.exports = {
   postNewHistory,
   patchHistory,
+  getHistoryByUser,
   getHistoryById,
   deleteHistory,
 };

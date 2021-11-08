@@ -1,54 +1,43 @@
 require("dotenv").config();
 const express = require("express");
-const logger = require("morgan");
-const mainRouter = require("./src/routes/index");
-const cors = require("cors");
-const app = express();
+const morgan = require("morgan");
+const corsApp = require("cors");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
+
+const mainRouter = require("./src/routes/");
+const { http } = require("npmlog");
+
+const app = express();
 const httpServer = createServer(app);
-const port = process.env.SECRET_PORT;
-const io = new Server(httpServer,  {
-  cors: {
-    origin: ["https://localhost:3000"],
-    methods: ["GET", "POST", "PATCH", "DELETE"],
-  }
+const cors = {
+  origin: "*",
+  // methods: "GET,PATCH,POST,DELETE",
+  // origin: ["http://localhost:3000", "http://192.168.0.101:3000"],
+
+};
+const io = new Server(httpServer, {
+  cors,
 });
-// instalasi parser
-app.use(express.urlencoded({ extended: false })); // memasang middleware parsing url-encoded
-app.use(express.json()); // memasang middleware parsing raw json
-app.use(logger("dev"));
+const port = process.env.PORT || 8000;
 
+// parser
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(morgan("dev"));
+app.use(corsApp());
 
-app.use(cors());
-// app.use((req, res, next) => {
-//   res.setHeader("Access-Control-Allow-Origin", "*");
-//   res.setHeader("Access-Control-Allow-Method", "GET,POST,PATCH,DELETE");
-//   res.setHeader("Access-Control-Allow-Header", "Content-Type, Authorization, x-access-token");
-//   next();
-// });
 app.use(express.static("public"));
-
 app.use(mainRouter);
 
-// BASE URL => http://localhost:8000
-// app.listen(port, () => console.log(`App started running at ${port}`));
-
-// SOCKET IO
 io.on("connection", (socket) => {
-    console.log(`User connected: ${socket.id}`);
-    socket.on("join_room", (data) => {
-      socket.join(data)
-      console.log(`User with ID: ${socket.id} joined room: ${data}`)
-    });
-    socket.on("send message", (data) => {
-      socket.to(data.room).emit("receive_message", data)
-    })
-    socket.on("disconnect", ()=> {
-      console.log("User Disconnected", socket.id)
-    })
-  });
-  // httpServer.listen(3000, () => {
-  //   console.log("server on");
-  // });
-  httpServer.listen(port, () => console.log("server running on port:" + port));
+  console.log("Socket Connected on", socket.id);
+});
+
+// Base url => http://localhost:8000
+httpServer.listen(port, () => {
+  console.log(`Server started at port ${port}`);
+});
+const socketIoObject = io;
+
+module.exports.ioObject = socketIoObject;

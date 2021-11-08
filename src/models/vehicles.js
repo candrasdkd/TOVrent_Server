@@ -36,7 +36,7 @@ const addNewVehicles = (req) => {
 
 const getAllVehicles = (query) => {
   return new Promise((resolve, reject) => {
-    const id = query?.id ? query.id : 0;
+    // const id = query?.id ? query.id : 0;
     const keyword = query?.keyword ? query.keyword : "";
     const filterByType = query?.type_id ? query.type_id : 1;
     const location = query?.location ? query.location : "";
@@ -45,15 +45,15 @@ const getAllVehicles = (query) => {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 4;
     const offset = limit * (page - 1);
-    let baseQuery = `SELECT v.id AS id, v.picture AS picture, v.name AS name, v.price AS price, v.quantity AS quantity, t.name AS type, c.name AS city, v.capacity AS capacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id WHERE v.name LIKE "%${keyword}%" AND v.type_id = ${filterByType} AND c.name LIKE "%${location}%" ORDER BY ${orderBy} ${sort} LIMIT ${limit} OFFSET ${offset}`;
+    let baseQuery = `SELECT v.id AS id, v.type_id AS modelId, v.picture AS picture, v.name AS name, v.price AS price, v.quantity AS quantity, t.name AS type, c.name AS city, v.capacity AS capacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id WHERE v.name LIKE "%${keyword}%" AND v.type_id = ${filterByType} AND c.name LIKE "%${location}%" ORDER BY ${orderBy} ${sort} LIMIT ${limit} OFFSET ${offset}`;
     db.query(baseQuery, (err, resultGet) => {
       if (err) return reject(err);
-      const countQs = `SELECT COUNT(v.id) AS totalData, v.picture AS picture, v.name AS name, v.price AS price, v.quantity AS quantity, t.name AS type, c.name AS city, v.capacity AS capacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id WHERE v.name LIKE "%${keyword}%" AND v.type_id = ${filterByType} AND c.name LIKE "%${location}%" ORDER BY ${orderBy} ${sort} LIMIT ${limit}`;
+      const countQs = `SELECT COUNT(v.id) AS totalData, v.picture AS picture, v.type_id AS modelId, v.name AS name, v.price AS price, v.quantity AS quantity, t.name AS type, c.name AS city, v.capacity AS capacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id WHERE v.name LIKE "%${keyword}%" AND v.type_id = ${filterByType} AND c.name LIKE "%${location}%" ORDER BY ${orderBy} ${sort} LIMIT ${limit}`;
       db.query(countQs, (err, resultCount) => {
         if (err) return reject(err);
         const totalData = resultCount[0].totalData;
         const totalPage = Math.ceil(totalData / limit);
-        const baseURL = `/vehicles/?`;
+        const baseURL = `vehicles/?`;
         let urlPrevPage = baseURL;
         let urlNextPage = baseURL;
         query.keyword &&
@@ -63,8 +63,8 @@ const getAllVehicles = (query) => {
           ((urlPrevPage = urlPrevPage + `location=${location}&`),
           (urlNextPage = urlNextPage + `location=${location}&`));
         query.type_id &&
-          ((urlPrevPage = urlPrevPage + `type_id${filterByType}&`),
-          (urlNextPage = urlNextPage + `type_id${filterByType}&`));
+          ((urlPrevPage = urlPrevPage + `type_id=${filterByType}&`),
+          (urlNextPage = urlNextPage + `type_id=${filterByType}&`));
         query.order_by &&
           ((urlPrevPage = urlPrevPage + `order_by=${orderBy}&`),
           (urlNextPage = urlNextPage + `order_by=${orderBy}&`));
@@ -120,7 +120,7 @@ const deleteVehicles = (body) => {
 };
 
 const patchByID = (req) => {
-  const { body, params, files} = req;
+  const { body, params, files } = req;
   let id = params.id;
   let picture = "";
   if (files) {
@@ -142,10 +142,10 @@ const patchByID = (req) => {
   return new Promise((resolve, reject) => {
     const queryString = "UPDATE tb_vehicles SET ? WHERE id = ?";
     db.query(queryString, [newInput, id], (err) => {
-      console.log(newInput)
+      console.log(newInput);
       if (err) return reject(err);
       const getUserQuery =
-      "SELECT v.id AS vehicleId, v.picture AS vehicleImage, v.name AS vehicleName, v.price AS vehiclePrice, v.quantity AS vehicleQuantity, t.name AS vehicleNameType, v.type_id AS vehicleTypeId, c.name AS vehicleCity, v.address AS vehicleAddress, v.user_id AS vehicleOwnerId,  v.city_id AS vehicleCityId, v.capacity AS vehicleCapacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id WHERE v.id = ?";
+        "SELECT v.id AS vehicleId, v.picture AS vehicleImage, v.name AS vehicleName, v.price AS vehiclePrice, v.quantity AS vehicleQuantity, t.name AS vehicleNameType, v.type_id AS vehicleTypeId, c.name AS vehicleCity, v.address AS vehicleAddress, v.user_id AS vehicleOwnerId,  v.city_id AS vehicleCityId, v.capacity AS vehicleCapacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id WHERE v.id = ?";
       db.query(getUserQuery, id, (err, vehicleData) => {
         if (err) return reject(err);
         // const vehicleInfo = [

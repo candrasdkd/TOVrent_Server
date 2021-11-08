@@ -81,7 +81,7 @@ The application will run on the designated port. Since we used the 8000 port to 
 
 ---
 
-link dokumentasi postman
+[link dokumentasi postman](https://documenter.getpostman.com/view/16864421/UVC2Fo1U)
 There are four main routes, with each route stemming from the base route in this application.
 
 - [("/")](http://localhost:8000/) is the base route.
