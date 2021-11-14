@@ -26,11 +26,11 @@ const login = (req, res) => {
     .login(body)
     .then((result) => responseHelper.success(res, "Success Login", 200, result))
     .catch((err) => {
-      if (err === 401)
+      if (err === 404)
         responseHelper.error(
           res,
           "Invalid Email or Password",
-          401,
+          404,
           "check your valid data"
         );
       else responseHelper.error(res, "Error", 500, err);

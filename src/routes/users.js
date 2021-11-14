@@ -31,7 +31,7 @@ userRouter.patch(
 userRouter.post("/forgot_password", userHandler.forgotPassword);
 userRouter.post("/forgot_password/check-code", userHandler.checkForgotPassword);
 userRouter.patch(
-  "/forgot_password/change_password",
+  "/forgot_password/change-password",
   userHandler.changePassword
 );
 module.exports = userRouter;

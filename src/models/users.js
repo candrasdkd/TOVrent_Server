@@ -37,18 +37,18 @@ const editUser = (file, id, body) => {
         db.query(getUserQuery, id, (err, resultBody) => {
           if (err) return reject(err);
           const userInfo = {
-              userId: resultBody[0].id,
-              userUsername: resultBody[0].username,
-              userFullName: resultBody[0].full_name,
-              userPhone: resultBody[0].phone_number,
-              userEmail: resultBody[0].email,
-              userGender: resultBody[0].gender,
-              userAddress: resultBody[0].address,
-              userImage: resultBody[0].picture,
-              userDOB: resultBody[0].dob,
-              userCardNumber: resultBody[0].card_number,
-              authLevel: Number(resultBody[0].role_id),
-            }
+            userId: resultBody[0].id,
+            userUsername: resultBody[0].username,
+            userFullName: resultBody[0].full_name,
+            userPhone: resultBody[0].phone_number,
+            userEmail: resultBody[0].email,
+            userGender: resultBody[0].gender,
+            userAddress: resultBody[0].address,
+            userImage: resultBody[0].picture,
+            userDOB: resultBody[0].dob,
+            userCardNumber: resultBody[0].card_number,
+            authLevel: Number(resultBody[0].role_id),
+          };
           return resolve(userInfo);
         });
       });
@@ -111,7 +111,10 @@ const forgotPassword = (body) => {
         // send email
         transporter.sendMail(mailOptions, (err) => {
           if (err) return reject("node mailer error");
-          return resolve("code sent to database and email");
+          const finalResult = {
+            email: result[0].email,
+          };
+          return resolve(finalResult);
         });
       });
     });
@@ -126,11 +129,15 @@ const checkForgotCode = (body) => {
       if (err) return reject(err);
       const email = result[0].email;
       const checkCodeQuery =
-        "SELECT code FROM forgot_password WHERE email = ? AND code = ?";
+        "SELECT email, code FROM forgot_password WHERE email = ? AND code = ?";
       db.query(checkCodeQuery, [email, code], (err, res) => {
         if (err) return reject(err);
         if (!res.length) return reject(404);
-        return resolve("Code is valid");
+        const finalResult = {
+          email: res[0].email,
+          code: res[0].code,
+        };
+        return resolve(finalResult);
       });
     });
   });
@@ -138,26 +145,20 @@ const checkForgotCode = (body) => {
 
 const changePassword = (body) => {
   return new Promise((resolve, reject) => {
-    const { code, email, password } = body;
-    const getEmailQuery = "SELECT email FROM tb_users WHERE email = ?";
-    db.query(getEmailQuery, email, (err, result) => {
+    const { email, password } = body;
+    const checkCodeQuery = "SELECT email FROM tb_users WHERE email = ?";
+    db.query(checkCodeQuery, email, (err, res) => {
       if (err) return reject(err);
-      const email = result[0].email;
-      const checkCodeQuery =
-        "SELECT code FROM forgot_password WHERE email = ? AND code = ?";
-      db.query(checkCodeQuery, [email, code], (err, res) => {
-        if (err) return reject(err);
-        if (!res.length) return reject(404);
-        const updatePassQuery = "UPDATE users SET ? WHERE email = ?";
-        bcrypt.hash(password, 10, (err, hash) => {
-          if (err) return reject("Bcrypt hash password error");
-          const newPassword = {
-            password: hash,
-          };
-          db.query(updatePassQuery, [newPassword, email], (err) => {
-            if (err) return reject(err);
-            return resolve("Password sudah diganti");
-          });
+      if (!res.length) return reject(404);
+      const updatePassQuery = "UPDATE tb_users SET ? WHERE email = ?";
+      bcrypt.hash(password, 10, (err, hash) => {
+        if (err) return reject("Bcrypt hash password error");
+        const newPassword = {
+          password: hash,
+        };
+        db.query(updatePassQuery, [newPassword, email], (err) => {
+          if (err) return reject(err);
+          return resolve("Password sudah diganti");
         });
       });
     });

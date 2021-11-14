@@ -36,10 +36,10 @@ const login = (body) => {
     const getQuery = `SELECT * FROM tb_users WHERE email = ?`;
     db.query(getQuery, email, (err, resultBody) => {
       if (err) return reject(err);
-      if (!resultBody.length) return reject(401);
+      if (!resultBody.length) return reject(404);
       bcrypt.compare(password, resultBody[0].password, (err, resultCompare) => {
         if (err) return reject("Compare password error");
-        if (!resultCompare) return reject(401);
+        if (!resultCompare) return reject(404);
         // console.log(resultBody[0].dob)
         const userInfo = {
           userId: resultBody[0].id,

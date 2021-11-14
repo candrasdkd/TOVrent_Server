@@ -39,7 +39,7 @@ const forgotPassword = (req, res) => {
   const { body } = req;
   userModel
     .forgotPassword(body)
-    .then((result) => responseHelper.success(res, "Success", 201, result))
+    .then((result) => responseHelper.success(res, "Check Email Success", 200, result))
     .catch((err) => {
       if (err === 404) {
         return responseHelper.error(
@@ -57,7 +57,7 @@ const checkForgotPassword = (req, res) => {
   const { body } = req;
   userModel
     .checkForgotCode(body)
-    .then((result) => responseHelper.success(res, "Success", 200, result))
+    .then((result) => responseHelper.success(res, "Check Code Success", 200, result))
     .catch((err) => {
       if (err === 404) {
         return responseHelper.error(res, "err", 404, "Code is invalid");
