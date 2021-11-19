@@ -1,31 +1,30 @@
 // const mysql = require("../database/mysql");
 const db = require("../database/db");
 
-const postNewHistory = (body) => {
+const createHistory = (body) => {
   return new Promise((resolve, reject) => {
-    // console.log(body, query);
     const queryString = "INSERT INTO tb_histories SET ?";
-    // console.log('test',err, body)
-    db.query(queryString, body, (err, result) => {
-      console.log(result, body);
+    db.query(queryString, body, (err, resultPost) => {
       if (err) return reject(err);
-      return resolve(result.insertId);
+      const id = resultPost.insertId;
+      // o.full_name AS owner
+      const getQuery = `SELECT h.id AS id, h.user_id AS customerId, h.owner_id AS ownerId, v.picture AS picture, v.name AS vehicleName, v.type_id AS vehicleType, h.quantity AS totalQuantity, h.location AS vehicleLocation, h.price AS totalPrice, u.full_name AS customer, u.email AS email, u.phone_number AS phoneNumber, h.booking_code AS bookingCode, h.days AS dayDuration, h.status_id AS orderStatus, h.method_payment AS paymentMethod, h.from_date AS startDate, h.to_date AS expiredDate FROM tb_histories h JOIN tb_users u ON u.id = h.user_id JOIN tb_users o ON o.id = h.owner_id JOIN tb_vehicles v ON v.id = h.vehicle_id WHERE h.id = ${id}`;
+      db.query(getQuery, (err, finalResult) => {
+        if (err) return reject(err);
+        return resolve(finalResult);
+      });
     });
   });
 };
 
-const patchHistory = (body, id) => {
+const updateHistory = (body, id) => {
   return new Promise((resolve, reject) => {
-    // console.log(body, query);
     const updateQuery = "UPDATE tb_histories SET ? WHERE id = ?";
-    // console.log("test", body);
-    db.query(updateQuery, [body, id], (err, result) => {
-      // console.log("bnody", body);
+    db.query(updateQuery, [body, id], (err) => {
       if (err) return reject(err);
       const queryString =
-        "SELECT h.id AS historyId, h.price AS historyPrice, h.method_payment AS historyMethod, h.days AS historyDuration, h.location AS historyLocation ,h.status_id AS historyStatusId, h.quantity AS historyQuantity, h.from_date AS historyStartDate, h.to_date AS historyExpiredDate, u.full_name AS userName, u.phone_number AS userPhone,u.email AS userEmail, h.booking_code AS historyBookingCode, h.user_id AS historyUserId, h.owner_id AS historyOwnerId, v.picture AS vehicleImage, v.name AS vehicleName, s.user_status AS statusUser, s.owner_status AS statusOwner FROM tb_histories h JOIN tb_users u ON u.id = h.user_id JOIN tb_vehicles v ON v.id = h.vehicle_id JOIN status_history s ON s.id = h.status_id WHERE h.id = ?";
+        "SELECT h.id AS id, h.user_id AS customerId, h.owner_id AS ownerId, v.picture AS picture, v.name AS vehicleName, v.type_id AS vehicleType, h.quantity AS totalQuantity, h.location AS vehicleLocation, h.price AS totalPrice, u.full_name AS customer, u.email AS email, u.phone_number AS phoneNumber, h.booking_code AS bookingCode, h.days AS dayDuration, h.status_id AS orderStatus, h.method_payment AS paymentMethod, h.from_date AS startDate, h.to_date AS expiredDate FROM tb_histories h JOIN tb_users u ON u.id = h.user_id JOIN tb_users o ON o.id = h.owner_id JOIN tb_vehicles v ON v.id = h.vehicle_id WHERE h.id = ?";
       db.query(queryString, id, (err, result) => {
-        // console.log("result", result);
         if (err) return reject(err);
         return resolve(result);
       });
@@ -34,9 +33,8 @@ const patchHistory = (body, id) => {
 };
 const getHistoryById = (id) => {
   return new Promise((resolve, reject) => {
-    const queryString = `SELECT h.id AS historyId, h.price AS historyPrice, h.method_payment AS historyMethod, h.type AS historyVehicleType ,h.days AS historyDuration, h.location AS historyLocation ,h.status_id AS historyStatusId, h.quantity AS historyQuantity, h.from_date AS historyStartDate, h.to_date AS historyExpiredDate, u.full_name AS userName, u.phone_number AS userPhone,u.email AS userEmail, h.booking_code AS historyBookingCode, h.user_id AS historyUserId, h.owner_id AS historyOwnerId, v.picture AS vehicleImage, v.name AS vehicleName, s.user_status AS statusUser, s.owner_status AS statusOwner FROM tb_histories h JOIN tb_users u ON u.id = h.user_id JOIN tb_vehicles v ON v.id = h.vehicle_id JOIN status_history s ON s.id = h.status_id WHERE h.id = ${id}`;
+    const queryString = `SELECT h.id AS id, h.user_id AS customerId, h.owner_id AS ownerId, v.picture AS picture, v.name AS vehicleName, v.type_id AS vehicleType, h.quantity AS totalQuantity, h.location AS vehicleLocation, h.price AS totalPrice, u.full_name AS customer, u.email AS email, u.phone_number AS phoneNumber, h.booking_code AS bookingCode, h.days AS dayDuration, h.status_id AS orderStatus, h.method_payment AS paymentMethod, h.from_date AS startDate, h.to_date AS expiredDate FROM tb_histories h JOIN tb_users u ON u.id = h.user_id JOIN tb_users o ON o.id = h.owner_id JOIN tb_vehicles v ON v.id = h.vehicle_id WHERE h.id = ${id}`;
     db.query(queryString, (err, result) => {
-      console.log("result", err);
       if (err) return reject(err);
       return resolve(result);
     });
@@ -46,14 +44,14 @@ const getHistoryById = (id) => {
 const getHistoryByUser = (params) => {
   return new Promise((resolve, reject) => {
     const userId = params.id;
-    const queryString = `SELECT h.id AS historyId, h.price AS historyPrice, h.method_payment AS historyMethod, h.type AS historyVehicleType ,h.days AS historyDuration, h.location AS historyLocation ,h.status_id AS historyStatusId, h.quantity AS historyQuantity, h.from_date AS historyStartDate, h.to_date AS historyExpiredDate, u.full_name AS userName, u.phone_number AS userPhone,u.email AS userEmail, h.booking_code AS historyBookingCode, h.user_id AS historyUserId, h.owner_id AS historyOwnerId, v.picture AS vehicleImage, v.name AS vehicleName, s.user_status AS statusUser, s.owner_status AS statusOwner FROM tb_histories h JOIN tb_users u ON u.id = h.user_id JOIN tb_vehicles v ON v.id = h.vehicle_id JOIN status_history s ON s.id = h.status_id WHERE h.user_id = ? OR h.owner_id = ?`;
+    const queryString = `SELECT h.id AS id, h.user_id AS customerId, h.owner_id AS ownerId, v.picture AS picture, v.name AS vehicleName, v.type_id AS vehicleType, h.quantity AS totalQuantity, h.location AS vehicleLocation, h.price AS totalPrice, u.full_name AS customer, u.email AS email, u.phone_number AS phoneNumber, h.booking_code AS bookingCode, h.days AS dayDuration, h.status_id AS orderStatus, h.method_payment AS paymentMethod, h.from_date AS startDate, h.to_date AS expiredDate FROM tb_histories h JOIN tb_users u ON u.id = h.user_id JOIN tb_users o ON o.id = h.owner_id JOIN tb_vehicles v ON v.id = h.vehicle_id WHERE h.user_id = ? OR h.owner_id = ?`;
     db.query(queryString, [userId, userId], (err, result) => {
-      // console.log("result", result, queryString);
       if (err) return reject(err);
       return resolve(result);
     });
   });
 };
+
 const deleteHistory = (id) => {
   return new Promise((resolve, reject) => {
     const queryString = "DELETE FROM tb_histories WHERE id = ?";
@@ -65,8 +63,8 @@ const deleteHistory = (id) => {
 };
 
 module.exports = {
-  postNewHistory,
-  patchHistory,
+  createHistory,
+  updateHistory,
   getHistoryByUser,
   getHistoryById,
   deleteHistory,

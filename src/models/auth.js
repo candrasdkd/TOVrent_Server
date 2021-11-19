@@ -10,10 +10,8 @@ const register = (body) => {
       if (err) return reject(err);
       if (resultGetEmail.length) return reject("emailHandler");
       bcrypt.genSalt(10, (err, resultSalt) => {
-        // console.log("salt", resultSalt);
         if (err) return reject("genSalt error");
         bcrypt.hash(password, resultSalt, (err, resultHashPassword) => {
-          // console.log("pw", resultHashPassword);
           if (err) return reject("Hash password error");
           const userData = {
             ...body,
@@ -40,23 +38,22 @@ const login = (body) => {
       bcrypt.compare(password, resultBody[0].password, (err, resultCompare) => {
         if (err) return reject("Compare password error");
         if (!resultCompare) return reject(404);
-        // console.log(resultBody[0].dob)
         const userInfo = {
-          userId: resultBody[0].id,
-          userUsername: resultBody[0].username,
-          userFullName: resultBody[0].full_name,
-          userPhone: resultBody[0].phone_number,
-          userEmail: resultBody[0].email,
-          userGender: resultBody[0].gender,
-          userAddress: resultBody[0].address,
-          userImage: resultBody[0].picture,
-          userDOB: resultBody[0].dob,
-          userCardNumber: resultBody[0].card_number,
+          id: resultBody[0].id,
+          username: resultBody[0].username,
+          fullName: resultBody[0].full_name,
+          phoneNumber: resultBody[0].phone_number,
+          email: resultBody[0].email,
+          gender: resultBody[0].gender,
+          address: resultBody[0].address,
+          image: resultBody[0].picture,
+          DOB: resultBody[0].dob,
+          cardNumber: resultBody[0].card_number,
           authLevel: Number(resultBody[0].role_id),
         };
         const payload = {
-          userFullName: resultBody[0].full_name,
-          userId: resultBody[0].id,
+          id: resultBody[0].id,
+          fullName: resultBody[0].full_name,
           authLevel: Number(resultBody[0].role_id),
         };
         jwt.sign(

@@ -6,37 +6,30 @@ const authMiddleware = require("../middlewares/auth");
 const fileValidation = require("../middlewares/uploadValidation");
 
 // localhost:8000/vehicles
-vehiclesRouter.get("/", vehicleHandler.getAllVehicles);
-vehiclesRouter.get(
-  "/popular",
-  vehicleHandler.popularVehicles
-);
-vehiclesRouter.get("/:id", vehicleHandler.getVehiclesById);
+vehiclesRouter.get("/", vehicleHandler.getAllVehicle);
+vehiclesRouter.get("/popular", vehicleHandler.getPopularVehicle);
+vehiclesRouter.get("/:id", vehicleHandler.getVehicleById);
 vehiclesRouter.post(
   "/",
   authMiddleware.checkToken,
   authMiddleware.authSeller,
   upload.uploadImage.array("picture", 5),
   fileValidation,
-  vehicleHandler.addNewVehicles
+  vehicleHandler.createVehicle
 );
-
-vehiclesRouter.delete(
-  "/",
-  authMiddleware.checkToken,
-  authMiddleware.authSeller,
-  vehicleHandler.deleteVehicles
-);
-
 vehiclesRouter.patch(
   "/:id",
   authMiddleware.checkToken,
   authMiddleware.authSeller,
   upload.uploadImage.array("picture", 5),
   fileValidation,
-  vehicleHandler.patchByID
+  vehicleHandler.updateVehicle
 );
-
-
+vehiclesRouter.delete(
+  "/",
+  authMiddleware.checkToken,
+  authMiddleware.authSeller,
+  vehicleHandler.deleteVehicle
+);
 
 module.exports = vehiclesRouter;

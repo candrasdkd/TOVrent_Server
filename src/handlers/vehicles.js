@@ -1,19 +1,36 @@
 const vehiclesModel = require("../models/vehicles");
 const responseHelper = require("../helpers/response");
 
-const addNewVehicles = (req, res) => {
+const createVehicle = (req, res) => {
   vehiclesModel
-    .addNewVehicles(req)
+    .createVehicle(req)
     .then((data) =>
-      responseHelper.success(res, "Create vehicle Success", 200, data)
+      responseHelper.success(res, "Create success", 200, data)
     )
     .catch((err) => responseHelper.error(res, "Error", 500, err));
 };
 
-const getAllVehicles = (req, res) => {
+const updateVehicle = (req, res) => {
+  vehiclesModel
+    .updateVehicle(req)
+    .then((data) => responseHelper.success(res, "Update success", 200, data))
+    .catch((err) => responseHelper.error(res, "Error", 500, err));
+};
+
+const getVehicleById = (req, res) => {
+  const { params } = req;
+  vehiclesModel
+    .getVehicleById(params.id)
+    .then((data) =>
+      responseHelper.success(res, "Success", 200, data)
+    )
+    .catch((err) => responseHelper.error(res, "Error", 500, err));
+};
+
+const getAllVehicle = (req, res) => {
   const { query} = req;
   vehiclesModel
-    .getAllVehicles(query)
+    .getAllVehicle(query)
     .then(
       ({ resultGet, totalData, totalPage, currentPage, prevPage, nextPage }) => {
         const info = {
@@ -25,48 +42,16 @@ const getAllVehicles = (req, res) => {
           prevPage,
           nextPage,
         };
-        responseHelper.success(res, "Get all Success", 200, info);
+        responseHelper.success(res, "Success", 200, info);
       }
     )
     .catch((err) => responseHelper.error(res, "Error", 500, err));
 };
-const getVehiclesById = (req, res) => {
-  const { params } = req;
-  vehiclesModel
-    .getVehiclesById(params.id)
-    .then((data) =>
-      responseHelper.success(res, "Get vehicle by id Success", 200, data)
-    )
-    .catch((err) => responseHelper.error(res, "Error", 500, err));
-};
 
-const getVehiclesByUser = (req, res) => {
-  const { params } = req;
-  vehiclesModel
-    .getVehiclesByUser(params.id)
-    .then((data) => responseHelper.success(res, "Success", 200, data))
-    .catch((err) => responseHelper.error(res, "Error", 500, err));
-};
-
-const deleteVehicles = (req, res) => {
-  const { body } = req;
-  vehiclesModel
-    .deleteVehicles(body)
-    .then((data) => responseHelper.success(res, "Success", 200, data))
-    .catch((err) => responseHelper.error(res, "Error", 500, err));
-};
-
-const patchByID = (req, res) => {
-  vehiclesModel
-    .patchByID(req)
-    .then((data) => responseHelper.success(res, "Success", 200, data))
-    .catch((err) => responseHelper.error(res, "Error", 500, err));
-};
-
-const popularVehicles = (req, res) => {
+const getPopularVehicle = (req, res) => {
   const { query } = req;
   vehiclesModel
-    .popularVehicles(query)
+    .getPopularVehicle(query)
     .then(
       ({ result, totalData, totalPage, currentPage, prevPage, nextPage }) => {
         const info = {
@@ -78,18 +63,25 @@ const popularVehicles = (req, res) => {
           prevPage,
           nextPage,
         };
-        responseHelper.success(res, "Popular Success", 200, info);
+        responseHelper.success(res, "Success", 200, info);
       }
     )
     .catch((err) => responseHelper.error(res, "Error", 500, err));
 };
 
+const deleteVehicle = (req, res) => {
+  const { body } = req;
+  vehiclesModel
+    .deleteVehicle(body)
+    .then((data) => responseHelper.success(res, "Delete successful", 200, data))
+    .catch((err) => responseHelper.error(res, "Error", 500, err));
+};
+
 module.exports = {
-  addNewVehicles,
-  getAllVehicles,
-  getVehiclesById,
-  getVehiclesByUser,
-  deleteVehicles,
-  patchByID,
-  popularVehicles,
+  createVehicle,
+  getAllVehicle,
+  getVehicleById,
+  deleteVehicle,
+  updateVehicle,
+  getPopularVehicle,
 };

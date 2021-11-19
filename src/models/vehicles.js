@@ -1,6 +1,6 @@
 const db = require("../database/db");
 
-const addNewVehicles = (req) => {
+const createVehicle = (req) => {
   return new Promise((resolve, reject) => {
     const { body, files } = req;
     let picture = "";
@@ -27,19 +27,69 @@ const addNewVehicles = (req) => {
       newInput = inputWithPic;
     }
     const queryString = "INSERT INTO tb_vehicles SET ?";
-    db.query(queryString, newInput, (err, result) => {
+    db.query(queryString, newInput, (err, resultPost) => {
+      console.log(resultPost);
+      if (err) return reject(err);
+      const id = resultPost.insertId;
+      const getQuery = `SELECT v.id AS id, v.picture AS image, v.name AS name, v.price AS price, v.quantity AS quantity, v.type_id AS typeId, t.name AS type, v.city_id AS cityId, c.name AS city, v.address AS address, v.user_id AS ownerId, v.capacity AS capacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id  WHERE v.id = ${id}`;
+      db.query(getQuery, (err, result) => {
+        if (err) return reject(err);
+        return resolve(result);
+      });
+    });
+  });
+};
+
+const updateVehicle = (req) => {
+  const { body, params, files } = req;
+  let id = params.id;
+  let picture = "";
+  if (files) {
+    for (let i = 0; i < files.length; i++) {
+      picture += `/images/${files[i].filename},`;
+    }
+  }
+  let input = {
+    picture,
+  };
+  const inputWithoutPic = { ...body };
+  const inputWithPic = { ...body, ...input };
+  let newInput = {};
+  if (!picture) {
+    newInput = inputWithoutPic;
+  } else {
+    newInput = inputWithPic;
+  }
+  return new Promise((resolve, reject) => {
+    const queryString = "UPDATE tb_vehicles SET ? WHERE id = ?";
+    db.query(queryString, [newInput, id], (err) => {
+      console.log(newInput);
+      if (err) return reject(err);
+      const getUserQuery =
+        "SELECT v.id AS vehicleId, v.picture AS vehicleImage, v.name AS vehicleName, v.price AS vehiclePrice, v.quantity AS vehicleQuantity, t.name AS vehicleNameType, v.type_id AS vehicleTypeId, c.name AS vehicleCity, v.address AS vehicleAddress, v.user_id AS vehicleOwnerId,  v.city_id AS vehicleCityId, v.capacity AS vehicleCapacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id WHERE v.id = ?";
+      db.query(getUserQuery, id, (err, vehicleData) => {
+        if (err) return reject(err);
+        return resolve(vehicleData);
+      });
+    });
+  });
+};
+
+const getVehicleById = (id) => {
+  return new Promise((resolve, reject) => {
+    const queryString =
+      "SELECT v.id AS id, v.picture AS image, v.name AS name, v.price AS price, v.quantity AS quantity, v.type_id AS typeId, t.name AS type, v.city_id AS cityId, c.name AS city, v.address AS address, v.user_id AS ownerId, v.capacity AS capacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id  WHERE v.id = ?";
+    db.query(queryString, id, (err, result) => {
       if (err) return reject(err);
       return resolve(result);
     });
   });
 };
 
-const getAllVehicles = (query) => {
+const getAllVehicle = (query) => {
   return new Promise((resolve, reject) => {
-    // const id = query?.id ? query.id : 0;
     const keyword = query?.keyword ? query.keyword : "";
     const filterByType = query?.type_id ? `= ${query.type_id}` : "> 0";
-    // const filterByType = query?.type_id ? query.type_id : "> 0";
     const location = query?.location ? query.location : "";
     const orderBy = query.order_by ? query.order_by : "v.id";
     const sort = query.sort ? query.sort : "ASC";
@@ -88,88 +138,7 @@ const getAllVehicles = (query) => {
   });
 };
 
-const getVehiclesById = (id) => {
-  return new Promise((resolve, reject) => {
-    const queryString =
-      "SELECT v.id AS vehicleId, v.picture AS vehicleImage, v.name AS vehicleName, v.price AS vehiclePrice, v.quantity AS vehicleQuantity, t.name AS vehicleNameType, v.type_id AS vehicleTypeId, c.name AS vehicleCity, v.address AS vehicleAddress, v.user_id AS vehicleOwnerId,  v.city_id AS vehicleCityId, v.capacity AS vehicleCapacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id  WHERE v.id = ?";
-    db.query(queryString, id, (err, result) => {
-      if (err) return reject(err);
-      return resolve(result);
-    });
-  });
-};
-
-const getVehiclesByUser = (id) => {
-  return new Promise((resolve, reject) => {
-    const queryString =
-      "SELECT * FROM tb_histories h JOIN tb_users u ON u.id = h.user_id WHERE u.id = ?";
-    db.query(queryString, id, (err, result) => {
-      if (err) return reject(err);
-      return resolve(result);
-    });
-  });
-};
-
-const deleteVehicles = (body) => {
-  return new Promise((resolve, reject) => {
-    const queryString = "DELETE FROM tb_vehicles WHERE ?";
-    db.query(queryString, body, (err, result) => {
-      if (err) return reject(err);
-      return resolve(result);
-    });
-  });
-};
-
-const patchByID = (req) => {
-  const { body, params, files } = req;
-  let id = params.id;
-  let picture = "";
-  if (files) {
-    for (let i = 0; i < files.length; i++) {
-      picture += `/images/${files[i].filename},`;
-    }
-  }
-  let input = {
-    picture,
-  };
-  const inputWithoutPic = { ...body };
-  const inputWithPic = { ...body, ...input };
-  let newInput = {};
-  if (!picture) {
-    newInput = inputWithoutPic;
-  } else {
-    newInput = inputWithPic;
-  }
-  return new Promise((resolve, reject) => {
-    const queryString = "UPDATE tb_vehicles SET ? WHERE id = ?";
-    db.query(queryString, [newInput, id], (err) => {
-      console.log(newInput);
-      if (err) return reject(err);
-      const getUserQuery =
-        "SELECT v.id AS vehicleId, v.picture AS vehicleImage, v.name AS vehicleName, v.price AS vehiclePrice, v.quantity AS vehicleQuantity, t.name AS vehicleNameType, v.type_id AS vehicleTypeId, c.name AS vehicleCity, v.address AS vehicleAddress, v.user_id AS vehicleOwnerId,  v.city_id AS vehicleCityId, v.capacity AS vehicleCapacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id WHERE v.id = ?";
-      db.query(getUserQuery, id, (err, vehicleData) => {
-        if (err) return reject(err);
-        // const vehicleInfo = [
-        //   {
-        //     id: vehicleData[0].id,
-        //     address: vehicleData[0].address,
-        //     name: vehicleData[0].name,
-        //     picture: vehicleData[0].picture,
-        //     city: vehicleData[0].city_id,
-        //     capacity: vehicleData[0].capacity,
-        //     model: vehicleData[0].type_id,
-        //     quantity: vehicleData[0].quantity,
-        //     price: vehicleData[0].price,
-        //     owner: vehicleData[0].user_id
-        //   },
-        // ];
-        return resolve(vehicleData);
-      });
-    });
-  });
-};
-
-const popularVehicles = (query) => {
+const getPopularVehicle = (query) => {
   return new Promise((resolve, reject) => {
     const orderBy = query.order_by ? query.order_by : "h.rating";
     const sort = query.sort ? query.sort : "DESC";
@@ -209,12 +178,21 @@ const popularVehicles = (query) => {
   });
 };
 
+const deleteVehicle = (body) => {
+  return new Promise((resolve, reject) => {
+    const queryString = "DELETE FROM tb_vehicles WHERE ?";
+    db.query(queryString, body, (err, result) => {
+      if (err) return reject(err);
+      return resolve(result);
+    });
+  });
+};
+
 module.exports = {
-  addNewVehicles,
-  getAllVehicles,
-  getVehiclesById,
-  getVehiclesByUser,
-  deleteVehicles,
-  patchByID,
-  popularVehicles,
+  createVehicle,
+  getAllVehicle,
+  getVehicleById,
+  deleteVehicle,
+  updateVehicle,
+  getPopularVehicle,
 };

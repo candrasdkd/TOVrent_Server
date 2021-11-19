@@ -4,7 +4,7 @@ const nodemailer = require("nodemailer");
 
 const getUserById = (id) => {
   return new Promise((resolve, reject) => {
-    const queryGet = `SELECT id AS userId, username AS userUsernam, full_name AS userFullName, phone_number AS userPhone, email AS userEmail, gender AS userGender, address AS userAddress, picture AS userImage, dob AS userDOB, card_number AS userCardNumber, role_id AS authLevel FROM tb_users WHERE id = ?`;
+    const queryGet = `SELECT id AS id, username AS username, full_name AS fullName, phone_number AS phoneNumber, email AS email, gender AS gender, address AS address, picture AS image, dob AS DOB, card_number AS cardNumber, role_id AS authLevel FROM tb_users WHERE id = ?`;
     db.query(queryGet, id, (err, result) => {
       if (err) return reject(err);
       return resolve(result);
@@ -37,16 +37,16 @@ const editUser = (file, id, body) => {
         db.query(getUserQuery, id, (err, resultBody) => {
           if (err) return reject(err);
           const userInfo = {
-            userId: resultBody[0].id,
-            userUsername: resultBody[0].username,
-            userFullName: resultBody[0].full_name,
-            userPhone: resultBody[0].phone_number,
-            userEmail: resultBody[0].email,
-            userGender: resultBody[0].gender,
-            userAddress: resultBody[0].address,
-            userImage: resultBody[0].picture,
-            userDOB: resultBody[0].dob,
-            userCardNumber: resultBody[0].card_number,
+            id: resultBody[0].id,
+            username: resultBody[0].username,
+            fullName: resultBody[0].full_name,
+            phoneNumber: resultBody[0].phone_number,
+            email: resultBody[0].email,
+            gender: resultBody[0].gender,
+            address: resultBody[0].address,
+            image: resultBody[0].picture,
+            DOB: resultBody[0].dob,
+            cardNumber: resultBody[0].card_number,
             authLevel: Number(resultBody[0].role_id),
           };
           return resolve(userInfo);
@@ -158,7 +158,7 @@ const changePassword = (body) => {
         };
         db.query(updatePassQuery, [newPassword, email], (err) => {
           if (err) return reject(err);
-          return resolve("Password sudah diganti");
+          return resolve("Password has changed");
         });
       });
     });

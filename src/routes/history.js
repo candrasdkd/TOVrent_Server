@@ -6,7 +6,7 @@ const historyHandler = require("../handlers/history");
 historyRouter.post(
   "/",
   authMiddleware.checkToken,
-  historyHandler.postNewHistory
+  historyHandler.createHistory
 );
 historyRouter.get(
   "/user/:id",
@@ -22,7 +22,7 @@ historyRouter.get(
 historyRouter.patch(
   "/:id",
   authMiddleware.checkToken,
-  historyHandler.patchHistory
+  historyHandler.updateHistory
 );
 historyRouter.delete("/:id", historyHandler.deleteHistory);
 

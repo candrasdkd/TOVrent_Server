@@ -1,18 +1,18 @@
 const historyModel = require("../models/history");
 const responseHelper = require("../helpers/response");
 
-const postNewHistory = (req, res) => {
+const createHistory = (req, res) => {
   const { body } = req;
   historyModel
-    .postNewHistory(body)
+    .createHistory(body)
     .then((data) => responseHelper.success(res, "Success", 200, data))
     .catch((err) => responseHelper.error(res, "Error", 500, err));
 };
 
-const patchHistory = (req, res) => {
+const updateHistory = (req, res) => {
   const { body, params } = req;
   historyModel
-    .patchHistory(body, params.id)
+    .updateHistory(body, params.id)
     .then((data) => responseHelper.success(res, "Success", 200, data))
     .catch((err) => responseHelper.error(res, "Error", 500, err));
 };
@@ -39,8 +39,8 @@ const deleteHistory = (req, res) => {
 };
 
 module.exports = {
-  postNewHistory,
-  patchHistory,
+  createHistory,
+  updateHistory,
   getHistoryByUser,
   getHistoryById,
   deleteHistory,
