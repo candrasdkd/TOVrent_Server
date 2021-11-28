@@ -89,22 +89,25 @@ const getVehicleById = (id) => {
 const getAllVehicle = (query) => {
   return new Promise((resolve, reject) => {
     const keyword = query?.keyword ? query.keyword : "";
-    const filterByType = query?.type_id ? `= ${query.type_id}` : "> 0";
+    const filterByType = query?.type_id ? `=${query.type_id}` : "> 0";
     const location = query?.location ? query.location : "";
+    const minPrice = query?.min_price ? query.min_price : 0;
+    const maxPrice = query?.max_price ? query.max_price : 999999999;
     const orderBy = query.order_by ? query.order_by : "v.id";
     const sort = query.sort ? query.sort : "ASC";
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 4;
     const offset = limit * (page - 1);
-    let baseQuery = `SELECT v.id AS id, v.type_id AS modelId, v.picture AS picture, v.name AS name, v.price AS price, v.quantity AS quantity, t.name AS type, c.name AS city, v.capacity AS capacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id WHERE v.name LIKE "%${keyword}%" AND v.type_id ${filterByType} AND c.name LIKE "%${location}%" ORDER BY ${orderBy} ${sort} LIMIT ${limit} OFFSET ${offset}`;
+    const baseQuery = `SELECT v.id AS id, v.type_id AS modelId, v.picture AS picture, v.name AS name, v.price AS price, v.quantity AS quantity, t.name AS type, c.name AS city, v.capacity AS capacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id WHERE v.name LIKE "%${keyword}%" AND v.type_id ${filterByType} AND c.name LIKE "%${location}%" AND v.price >= ${minPrice} AND v.price <= ${maxPrice} ORDER BY ${orderBy} ${sort} LIMIT ${limit} OFFSET ${offset}`;
     db.query(baseQuery, (err, resultGet) => {
       if (err) return reject(err);
-      const countQs = `SELECT COUNT(v.id) AS totalData, v.picture AS picture, v.type_id AS modelId, v.name AS name, v.price AS price, v.quantity AS quantity, t.name AS type, c.name AS city, v.capacity AS capacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id WHERE v.name LIKE "%${keyword}%" AND v.type_id ${filterByType} AND c.name LIKE "%${location}%" ORDER BY ${orderBy} ${sort} LIMIT ${limit}`;
+      if (!resultGet.length) return reject(404);
+      const countQs = `SELECT COUNT(v.id) AS totalData, v.picture AS picture, v.type_id AS modelId, v.name AS name, v.price AS price, v.quantity AS quantity, t.name AS type, c.name AS city, v.capacity AS capacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id WHERE v.name LIKE "%${keyword}%" AND v.type_id ${filterByType} AND c.name LIKE "%${location}%" ORDER BY ${orderBy} ${sort}`;
       db.query(countQs, (err, resultCount) => {
         if (err) return reject(err);
         const totalData = resultCount[0].totalData;
         const totalPage = Math.ceil(totalData / limit);
-        const baseURL = `vehicles/?`;
+        const baseURL = `/vehicles?`;
         let urlPrevPage = baseURL;
         let urlNextPage = baseURL;
         query.keyword &&
@@ -114,8 +117,14 @@ const getAllVehicle = (query) => {
           ((urlPrevPage = urlPrevPage + `location=${location}&`),
           (urlNextPage = urlNextPage + `location=${location}&`));
         query.type_id &&
-          ((urlPrevPage = urlPrevPage + `type_id=${filterByType}&`),
-          (urlNextPage = urlNextPage + `type_id=${filterByType}&`));
+          ((urlPrevPage = urlPrevPage + `type_id${filterByType}&`),
+          (urlNextPage = urlNextPage + `type_id${filterByType}&`));
+        query.min_price &&
+          ((urlPrevPage = urlPrevPage + `min_price=${minPrice}&`),
+          (urlNextPage = urlNextPage + `min_price=${minPrice}&`));
+        query.max_price &&
+          ((urlPrevPage = urlPrevPage + `max_price=${maxPrice}&`),
+          (urlNextPage = urlNextPage + `max_price=${maxPrice}&`));
         query.order_by &&
           ((urlPrevPage = urlPrevPage + `order_by=${orderBy}&`),
           (urlNextPage = urlNextPage + `order_by=${orderBy}&`));

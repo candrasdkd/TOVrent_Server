@@ -4,9 +4,7 @@ const responseHelper = require("../helpers/response");
 const createVehicle = (req, res) => {
   vehiclesModel
     .createVehicle(req)
-    .then((data) =>
-      responseHelper.success(res, "Create success", 200, data)
-    )
+    .then((data) => responseHelper.success(res, "Create success", 200, data))
     .catch((err) => responseHelper.error(res, "Error", 500, err));
 };
 
@@ -21,18 +19,23 @@ const getVehicleById = (req, res) => {
   const { params } = req;
   vehiclesModel
     .getVehicleById(params.id)
-    .then((data) =>
-      responseHelper.success(res, "Success", 200, data)
-    )
+    .then((data) => responseHelper.success(res, "Success", 200, data))
     .catch((err) => responseHelper.error(res, "Error", 500, err));
 };
 
 const getAllVehicle = (req, res) => {
-  const { query} = req;
+  const { query } = req;
   vehiclesModel
     .getAllVehicle(query)
     .then(
-      ({ resultGet, totalData, totalPage, currentPage, prevPage, nextPage }) => {
+      ({
+        resultGet,
+        totalData,
+        totalPage,
+        currentPage,
+        prevPage,
+        nextPage,
+      }) => {
         const info = {
           data: resultGet,
           totalData,
@@ -45,7 +48,11 @@ const getAllVehicle = (req, res) => {
         responseHelper.success(res, "Success", 200, info);
       }
     )
-    .catch((err) => responseHelper.error(res, "Error", 500, err));
+    .catch((err) => {
+      if (err === 404)
+        responseHelper.error(res, "Not Found!", 404, "Data not found");
+      else responseHelper.error(res, "Error", 500, err);
+    });
 };
 
 const getPopularVehicle = (req, res) => {
@@ -55,7 +62,7 @@ const getPopularVehicle = (req, res) => {
     .then(
       ({ result, totalData, totalPage, currentPage, prevPage, nextPage }) => {
         const info = {
-          data:result,
+          data: result,
           totalData,
           totalData,
           totalPage,

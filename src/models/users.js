@@ -4,10 +4,23 @@ const nodemailer = require("nodemailer");
 
 const getUserById = (id) => {
   return new Promise((resolve, reject) => {
-    const queryGet = `SELECT id AS id, username AS username, full_name AS fullName, phone_number AS phoneNumber, email AS email, gender AS gender, address AS address, picture AS image, dob AS DOB, card_number AS cardNumber, role_id AS authLevel FROM tb_users WHERE id = ?`;
-    db.query(queryGet, id, (err, result) => {
+    const queryGet = "SELECT * FROM tb_users WHERE id = ?";
+    db.query(queryGet, id, (err, resultBody) => {
       if (err) return reject(err);
-      return resolve(result);
+      const userInfo = {
+        id: resultBody[0].id,
+        username: resultBody[0].username,
+        fullName: resultBody[0].full_name,
+        phoneNumber: resultBody[0].phone_number,
+        email: resultBody[0].email,
+        gender: resultBody[0].gender,
+        address: resultBody[0].address,
+        image: resultBody[0].picture,
+        DOB: resultBody[0].dob,
+        cardNumber: resultBody[0].card_number,
+        authLevel: Number(resultBody[0].role_id),
+      };
+      return resolve(userInfo);
     });
   });
 };
