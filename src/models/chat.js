@@ -29,7 +29,6 @@ const postChat = (body) => {
       [senderId, senderId, receiverId, receiverId],
       (err, result) => {
         const newBody = { ...body, ...{ isLatest: 1 } };
-        console.log("result", result);
         if (err) return reject(err);
         const patchLatestChat = `UPDATE tb_message SET isLatest = 0 WHERE id = ?`;
         const latestId = result[0]?.latest_id;
@@ -43,7 +42,6 @@ const postChat = (body) => {
           if (err) return reject(err);
           const queryGetUserName = `SELECT full_name, uuid FROM tb_users WHERE id = ?`;
           db.query(queryGetUserName, senderId, (err, userName) => {
-            console.log(body.message,senderId, userName);
             const senderName = userName[0].full_name;
             socket.ioObject.emit(receiverId, {
               message: body.text,
