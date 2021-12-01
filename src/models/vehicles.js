@@ -63,7 +63,6 @@ const updateVehicle = (req) => {
   return new Promise((resolve, reject) => {
     const queryString = "UPDATE tb_vehicles SET ? WHERE id = ?";
     db.query(queryString, [newInput, id], (err) => {
-      console.log(newInput);
       if (err) return reject(err);
       const getUserQuery =
         "SELECT v.id AS vehicleId, v.picture AS vehicleImage, v.name AS vehicleName, v.price AS vehiclePrice, v.quantity AS vehicleQuantity, t.name AS vehicleNameType, v.type_id AS vehicleTypeId, c.name AS vehicleCity, v.address AS vehicleAddress, v.user_id AS vehicleOwnerId,  v.city_id AS vehicleCityId, v.capacity AS vehicleCapacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id WHERE v.id = ?";
@@ -78,7 +77,7 @@ const updateVehicle = (req) => {
 const getVehicleById = (id) => {
   return new Promise((resolve, reject) => {
     const queryString =
-      "SELECT v.id AS id, v.picture AS image, v.name AS name, v.price AS price, v.quantity AS quantity, v.type_id AS typeId, t.name AS type, v.city_id AS cityId, c.name AS city, v.address AS address, v.user_id AS ownerId, v.capacity AS capacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_cities c ON c.id = v.city_id  WHERE v.id = ?";
+      "SELECT v.id AS id, v.picture AS image, v.name AS name, v.price AS price, v.quantity AS quantity, v.type_id AS typeId, t.name AS type, v.city_id AS cityId, c.name AS city, v.address AS address, v.user_id AS ownerId, u.full_name AS ownerName, v.capacity AS capacity FROM tb_vehicles v JOIN tb_types t ON t.id = v.type_id JOIN tb_users u ON u.id = v.user_id JOIN tb_cities c ON c.id = v.city_id  WHERE v.id = ?";
     db.query(queryString, id, (err, result) => {
       if (err) return reject(err);
       return resolve(result);
@@ -149,20 +148,20 @@ const getAllVehicle = (query) => {
 
 const getPopularVehicle = (query) => {
   return new Promise((resolve, reject) => {
-    const orderBy = query.order_by ? query.order_by : "h.rating";
+    const orderBy = query.order_by ? query.order_by : "COUNT(h.vehicle_id)";
     const sort = query.sort ? query.sort : "DESC";
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 4;
     const offset = limit * (page - 1);
-    const queryString = `SELECT v.id AS id, v.picture AS picture,v.name AS name, SUM(h.rating) AS rating, c.name AS city, t.name AS type FROM tb_vehicles v JOIN tb_histories h ON h.vehicle_id = v.id JOIN tb_cities c ON c.id = v.city_id JOIN tb_types t ON t.id = v.type_id GROUP BY v.id ORDER By ${orderBy} ${sort} LIMIT ${limit} OFFSET ${offset}`;
+    const queryString = `SELECT h.vehicle_id AS id, COUNT(h.vehicle_id) AS rating , v.type_id AS modelId, v.picture AS picture, v.name AS name, v.price AS price, v.quantity AS quantity, t.name AS type, c.name AS city, v.capacity AS capacity FROM tb_vehicles v JOIN tb_histories h ON h.vehicle_id = v.id JOIN tb_cities c ON c.id = v.city_id JOIN tb_types t ON t.id = v.type_id GROUP BY h.vehicle_id ORDER BY ${orderBy} ${sort} LIMIT ${limit} OFFSET ${offset}`;
     db.query(queryString, (err, result) => {
       if (err) return reject(err);
-      const queryCountTotal = `SELECT COUNT(v.id) AS totalData, v.picture AS picture,v.name AS name, SUM(h.rating) AS rating, c.name AS city, t.name AS type FROM tb_vehicles v JOIN tb_histories h ON h.vehicle_id = v.id JOIN tb_cities c ON c.id = v.city_id JOIN tb_types t ON t.id = v.type_id GROUP BY v.id ORDER By ${orderBy} ${sort} LIMIT ${limit}`;
+      const queryCountTotal = `SELECT h.vehicle_id AS id, COUNT(h.vehicle_id) AS rating, v.type_id AS modelId, v.picture AS picture, v.name AS name, v.price AS price, v.quantity AS quantity, t.name AS type, c.name AS city, v.capacity AS capacity FROM tb_vehicles v JOIN tb_histories h ON h.vehicle_id = v.id JOIN tb_cities c ON c.id = v.city_id JOIN tb_types t ON t.id = v.type_id GROUP BY h.vehicle_id ORDER BY ${orderBy} ${sort}`;
       db.query(queryCountTotal, (err, totalResult) => {
         if (err) return reject(err);
-        const totalData = totalResult[0].totalData;
+        const totalData = totalResult.length;
         const totalPage = Math.ceil(totalData / limit);
-        const baseURL = `/vehicles/popular?limit=${limit}&`;
+        const baseURL = `/vehicles/popular?`;
         let urlPrevPage = baseURL;
         let urlNextPage = baseURL;
         query.order_by &&
